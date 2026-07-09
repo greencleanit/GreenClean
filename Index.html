@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <base target="_top">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>Green Clean - Anagrafica Cliente</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <?!= include('Style'); ?>
+</head>
+
+<body>
+
+  <main class="page app-shell">
+    <section class="form-card">
+
+      <header class="header">
+        <div class="logo-wrap">
+          <?!= include('Logo'); ?>
+        </div>
+
+        <h1>Anagrafica Cliente</h1>
+        <p>Compila i dati aziendali per l'inserimento nel sistema Green Clean.</p>
+      </header>
+
+      <div class="progress-wrap">
+        <div class="progress-bar">
+          <div id="progressFill"></div>
+        </div>
+        <span id="progressText">0%</span>
+      </div>
+
+      <form id="clientForm" novalidate>
+
+        <div class="section">
+          <h2>1. Dati aziendali</h2>
+
+          <div class="grid">
+            <label>Ragione Sociale *
+              <input name="ragioneSociale" required>
+            </label>
+
+            <label>Forma Giuridica
+              <input name="formaGiuridica" placeholder="SRL, SPA, SNC...">
+            </label>
+
+            <label>Partita IVA *
+              <input name="partitaIva" required>
+            </label>
+
+            <label>Codice Fiscale
+              <input name="codiceFiscale">
+            </label>
+
+            <label>Codice SDI
+              <input name="codiceSdi" maxlength="7">
+            </label>
+
+            <label>PEC
+              <input name="pec" type="email">
+            </label>
+
+            <label class="full">Sito Web
+              <input name="sitoWeb" type="url" placeholder="https://">
+            </label>
+          </div>
+
+          <p class="hint">È obbligatorio compilare almeno uno tra Codice SDI e PEC.</p>
+        </div>
+
+        <div class="section">
+          <h2>2. Sede legale</h2>
+
+          <div class="grid">
+            <label class="full">Indirizzo
+              <input name="legaleIndirizzo">
+            </label>
+
+            <label>CAP
+              <input name="legaleCap" maxlength="5">
+            </label>
+
+            <label>Comune
+              <input name="legaleComune">
+            </label>
+
+            <label>Provincia
+              <input name="legaleProvincia" maxlength="2">
+            </label>
+
+            <label>Nazione
+              <input name="legaleNazione" value="Italia">
+            </label>
+          </div>
+        </div>
+
+        <div class="section">
+          <h2>3. Sede operativa</h2>
+
+          <label class="checkbox-row">
+            <input type="checkbox" name="sedeCoincide" id="sedeCoincide" checked>
+            <span>La sede operativa coincide con la sede legale</span>
+          </label>
+
+          <div id="sedeOperativaBox" class="grid hidden">
+            <label class="full">Indirizzo
+              <input name="operativaIndirizzo">
+            </label>
+
+            <label>CAP
+              <input name="operativaCap" maxlength="5">
+            </label>
+
+            <label>Comune
+              <input name="operativaComune">
+            </label>
+
+            <label>Provincia
+              <input name="operativaProvincia" maxlength="2">
+            </label>
+
+            <label>Nazione
+              <input name="operativaNazione" value="Italia">
+            </label>
+          </div>
+        </div>
+
+        <div class="section">
+          <h2>4. Referenti</h2>
+
+          <h3>Ufficio Acquisti</h3>
+          <div class="grid">
+            <input name="acquistiNome" placeholder="Nome">
+            <input name="acquistiTelefono" placeholder="Telefono">
+            <input name="acquistiCellulare" placeholder="Cellulare">
+            <input name="acquistiEmail" type="email" placeholder="Email">
+          </div>
+
+          <h3>Amministrazione</h3>
+          <div class="grid">
+            <input name="amministrazioneNome" placeholder="Nome">
+            <input name="amministrazioneTelefono" placeholder="Telefono">
+            <input name="amministrazioneCellulare" placeholder="Cellulare">
+            <input name="amministrazioneEmail" type="email" placeholder="Email">
+          </div>
+
+          <h3>Magazzino</h3>
+          <div class="grid">
+            <input name="magazzinoNome" placeholder="Nome">
+            <input name="magazzinoTelefono" placeholder="Telefono">
+            <input name="magazzinoCellulare" placeholder="Cellulare">
+            <input name="magazzinoEmail" type="email" placeholder="Email">
+          </div>
+        </div>
+
+        <div class="section">
+          <h2>5. Note operative</h2>
+
+          <textarea name="noteOperative" rows="5" placeholder="Inserisci eventuali note operative, preferenze di consegna, riferimenti interni o informazioni utili."></textarea>
+        </div>
+
+        <button id="submitBtn" type="submit">
+          <span class="btn-text">Invia anagrafica</span>
+          <span class="spinner hidden"></span>
+        </button>
+
+        <div id="messageBox" class="message hidden"></div>
+
+      </form>
+    </section>
+  </main>
+
+  <div id="successScreen" class="success-screen hidden">
+    <div class="success-card">
+
+      <div class="success-icon">✔</div>
+
+      <h1>Grazie per la collaborazione</h1>
+
+      <h2>L'anagrafica è stata acquisita correttamente.</h2>
+
+      <p>
+        I dati inseriti sono stati trasmessi al nostro
+        <strong>Ufficio Amministrazione</strong>, che provvederà alla registrazione
+        della vostra anagrafica all'interno dei sistemi Green Clean.
+      </p>
+
+      <p>
+        Per qualsiasi necessità o chiarimento potrete fare riferimento al vostro
+        <strong>Agente</strong>, che rimane a vostra completa disposizione.
+      </p>
+
+      <p class="thanks">Grazie per la fiducia accordataci.</p>
+
+      <div class="success-logo">
+        <?!= include('Logo'); ?>
+      </div>
+
+      <div class="company-name">Green Clean</div>
+      <div class="company-subtitle">by DaFra Green Solutions S.r.l.</div>
+
+      <p class="note">
+        La presente pagina conferma esclusivamente l'avvenuta trasmissione dei dati.
+      </p>
+
+      <button class="close-btn" onclick="closeSuccessScreen()">Chiudi</button>
+
+    </div>
+  </div>
+
+  <?!= include('Script'); ?>
+</body>
+</html>

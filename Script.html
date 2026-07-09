@@ -1,0 +1,156 @@
+<script>
+const form = document.getElementById('clientForm');
+const submitBtn = document.getElementById('submitBtn');
+const btnText = submitBtn.querySelector('.btn-text');
+const spinner = submitBtn.querySelector('.spinner');
+const messageBox = document.getElementById('messageBox');
+const sedeCoincide = document.getElementById('sedeCoincide');
+const sedeOperativaBox = document.getElementById('sedeOperativaBox');
+const progressFill = document.getElementById('progressFill');
+const progressText = document.getElementById('progressText');
+
+const requiredFields = [
+  'ragioneSociale',
+  'partitaIva'
+];
+
+function getFormData() {
+  const fd = new FormData(form);
+  const data = {};
+
+  fd.forEach((value, key) => {
+    data[key] = typeof value === 'string' ? value.trim() : value;
+  });
+
+  data.sedeCoincide = sedeCoincide.checked;
+
+  if (data.sedeCoincide) {
+    data.operativaIndirizzo = data.legaleIndirizzo || '';
+    data.operativaCap = data.legaleCap || '';
+    data.operativaComune = data.legaleComune || '';
+    data.operativaProvincia = data.legaleProvincia || '';
+    data.operativaNazione = data.legaleNazione || '';
+  }
+
+  return data;
+}
+
+function validateForm() {
+  const data = getFormData();
+  let valid = true;
+
+  form.querySelectorAll('input').forEach(input => {
+    input.classList.remove('invalid');
+  });
+
+  requiredFields.forEach(name => {
+    const input = form.elements[name];
+    if (input && !data[name]) {
+      input.classList.add('invalid');
+      valid = false;
+    }
+  });
+
+  const sdiInput = form.elements['codiceSdi'];
+  const pecInput = form.elements['pec'];
+
+  if (!data.codiceSdi && !data.pec) {
+    if (sdiInput) sdiInput.classList.add('invalid');
+    if (pecInput) pecInput.classList.add('invalid');
+    valid = false;
+  }
+
+  return valid;
+}
+
+function updateProgress() {
+  const fields = Array.from(form.querySelectorAll('input, textarea'))
+    .filter(el => el.type !== 'checkbox' && !el.closest('.hidden'));
+
+  const filled = fields.filter(el => el.value.trim() !== '').length;
+  const percent = fields.length ? Math.round((filled / fields.length) * 100) : 0;
+
+  progressFill.style.width = percent + '%';
+  progressText.textContent = percent + '%';
+}
+
+function showMessage(type, text) {
+  messageBox.className = 'message ' + type;
+  messageBox.textContent = text;
+  messageBox.classList.remove('hidden');
+}
+
+function setLoading(isLoading) {
+  submitBtn.disabled = isLoading;
+  spinner.classList.toggle('hidden', !isLoading);
+  btnText.textContent = isLoading ? 'Salvataggio in corso...' : 'Invia anagrafica';
+}
+
+function showSuccessScreen() {
+  const successScreen = document.getElementById('successScreen');
+  const appShell = document.querySelector('.app-shell');
+
+  if (appShell) {
+    appShell.classList.add('hidden');
+  }
+
+  if (successScreen) {
+    successScreen.classList.remove('hidden');
+    window.scrollTo(0, 0);
+  } else {
+    showMessage('success', 'Anagrafica acquisita correttamente.');
+  }
+}
+
+function closeSuccessScreen() {
+  window.open('', '_self');
+  window.close();
+
+  setTimeout(() => {
+    window.location.href = 'about:blank';
+  }, 300);
+}
+
+sedeCoincide.addEventListener('change', () => {
+  sedeOperativaBox.classList.toggle('hidden', sedeCoincide.checked);
+  updateProgress();
+});
+
+form.addEventListener('input', () => {
+  validateForm();
+  updateProgress();
+});
+
+form.addEventListener('submit', event => {
+  event.preventDefault();
+
+  messageBox.classList.add('hidden');
+
+  if (!validateForm()) {
+    showMessage('error', 'Controlla i campi obbligatori evidenziati.');
+    return;
+  }
+
+  const data = getFormData();
+
+  setLoading(true);
+
+  google.script.run
+    .withSuccessHandler(response => {
+      setLoading(false);
+
+      if (response && response.success) {
+        showSuccessScreen();
+      } else {
+        showMessage('error', response && response.message ? response.message : 'Errore durante il salvataggio.');
+      }
+    })
+    .withFailureHandler(error => {
+      setLoading(false);
+      showMessage('error', error && error.message ? error.message : 'Errore imprevisto.');
+    })
+    .saveCustomerData(data);
+});
+
+updateProgress();
+</script>
